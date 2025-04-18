@@ -4,14 +4,21 @@
 #include <SPI.h>
 #include <LoRa.h>
 
-#define SS 5
-#define RST 14
-#define DIO0 26
+// LoRa pins
+#define LORA_SS   5
+#define LORA_RST  14
+#define LORA_DIO0 26
+
+// ESP32 Serial2 pins - telemetry reception 
+#define ESP32_RX_PIN 16
+#define ESP32_TX_PIN 17  //send data from transmitter to teensy (Not used)
 
 void setupTransmitter() {
     Serial.println("Iniciando LoRa Transmisor...");
+
+    Serial2.begin(115200, SERIAL_8N1, ESP32_RX_PIN, ESP32_TX_PIN);
     
-    LoRa.setPins(SS, RST, DIO0);
+    LoRa.setPins(LORA_SS, LORA_RST, LORA_DIO0);
 
     if (!LoRa.begin(433E6)) {
         Serial.println("Error al iniciar LoRa.");
@@ -21,13 +28,20 @@ void setupTransmitter() {
     Serial.println("LoRa iniciado correctamente.");
 }
 
-void sendMessage(const char* message) {
-    Serial.print("Enviando mensaje: ");
-    Serial.println(message);
+void sendTelemetry() {
+    if (Serial2.available()) {
+        String telemetry = Serial2.readStringUntil('\n');
+        telemetry.trim(); 
 
-    LoRa.beginPacket();
-    LoRa.print(message);
-    LoRa.endPacket();
+        if (telemetry.length() > 0) {
+            Serial.print("Datos enviados: ");
+            Serial.println(telemetry);
+
+            LoRa.beginPacket();
+            LoRa.print(telemetry);
+            LoRa.endPacket();
+        }
+    }
 }
 
 #endif

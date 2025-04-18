@@ -1,4 +1,4 @@
-//Configuration for ILI9488
+/* Configuration for ILI9488 */
 
 #define ILI9488_DRIVER
 

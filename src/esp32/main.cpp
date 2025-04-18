@@ -24,8 +24,8 @@ void setup() {
 
 void loop() {
     #ifdef TRANSMITTER
-    sendMessage("Esto esta encendido????");
-    delay(2000);
+    sendTelemetry();
+    delay(100); 
     #endif
 
     #ifdef RECEIVER
